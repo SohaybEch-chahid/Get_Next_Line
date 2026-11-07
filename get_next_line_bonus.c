@@ -6,68 +6,11 @@
 /*   By: sech-cha <sech-cha@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/07 00:57:34 by sech-cha          #+#    #+#             */
-/*   Updated: 2026/11/07 14:56:32 by sech-cha         ###   ########.fr       */
+/*   Updated: 2026/11/07 15:36:33 by sech-cha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line_bonus.h"
-#include <fcntl.h>
-#include <limits.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <unistd.h>
-
-int	ft_strlen(char *s)
-{
-	int	i;
-
-	i = 0;
-	while (s && s[i])
-		i++;
-	return (i);
-}
-
-char	*ft_strjoin(char *s1, char *s2)
-{
-	char	*join;
-	int		i;
-	int		j;
-
-	if (!s1 && !s2)
-		return (NULL);
-	join = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
-	if (!join)
-		return (NULL);
-	i = 0;
-	while (s1 && s1[i])
-	{
-		join[i] = s1[i];
-		i++;
-	}
-	j = 0;
-	while (s2 && s2[j])
-		join[i++] = s2[j++];
-	join[i] = '\0';
-	return (join);
-}
-
-char	*ft_strchar(char *s, int c)
-{
-	int	i;
-
-	i = 0;
-	while (s && s[i])
-	{
-		if (s[i] == (char)c)
-			return (&s[i]);
-		i++;
-	}
-	if (s && (char)c == '\0')
-		return (&s[i]);
-	return (NULL);
-}
 
 char	*read_and_store(int fd, char *stash)
 {
@@ -166,81 +109,6 @@ char	*update_stash(char *stash)
 	free(stash);
 	return (new_stash);
 }
-void	remove_fd(t_fd **head, int fd)
-{
-	t_fd	*current;
-	t_fd	*tmp;
-
-	if (!head || !*head)
-		return ;
-	current = *head;
-	if (current->fd == fd)
-	{
-		tmp = current;
-		*head = current->next;
-		free(tmp->stash);
-		free(tmp);
-		return ;
-	}
-	while (current->next)
-	{
-		if (current->next->fd == fd)
-		{
-			tmp = current->next;
-			current->next = tmp->next;
-			free(tmp->stash);
-			free(tmp);
-			return ;
-		}
-		current = current->next;
-	}
-}
-
-t_fd	*find_fd(t_fd *head, int fd)
-{
-	t_fd	*node;
-
-	if (!head)
-		return (NULL);
-	node = head;
-	while (node)
-	{
-		if (node->fd == fd)
-		{
-			return (node);
-		}
-		node = node->next;
-	}
-	return (NULL);
-}
-
-t_fd	*new_fd(int fd)
-{
-	t_fd	*node;
-
-	node = malloc(sizeof(t_fd));
-	if (!node)
-		return (NULL);
-	node->fd = fd;
-	node->stash = NULL;
-	node->next = NULL;
-	return (node);
-}
-
-t_fd	*lst_add_back_fd(t_fd *head, t_fd *new)
-{
-	t_fd	*node;
-
-	if (!head)
-		return (new);
-	node = head;
-	while (node->next)
-	{
-		node = node->next;
-	}
-	node->next = new;
-	return (head);
-}
 
 char	*get_next_line(int fd)
 {
@@ -274,53 +142,4 @@ char	*get_next_line(int fd)
 	if (!node->stash)
 		remove_fd(&head, fd);
 	return (line);
-}
-
-int	main(void)
-{
-	char	*line;
-
-	int fd1, fd2, fd3;
-	fd1 = open("text1.txt", O_RDONLY);
-	if (fd1 == -1)
-	{
-		printf("error1");
-		return (1);
-	}
-	fd2 = open("text2.txt", O_RDONLY);
-	if (fd2 == -1)
-	{
-		printf("error2");
-		return (1);
-	}
-	fd3 = open("text3.txt", O_RDONLY);
-	if (fd3 == -1)
-	{
-		printf("error3");
-		return (1);
-	}
-	line = get_next_line(fd1);
-	printf("%s", line);
-	line = get_next_line(fd2);
-	printf("%s", line);
-	line = get_next_line(fd3);
-	printf("%s", line);
-	line = get_next_line(fd1);
-	printf("%s", line);
-	line = get_next_line(fd2);
-	printf("%s", line);
-	line = get_next_line(fd3);
-	printf("%s", line);
-	line = get_next_line(fd1);
-	printf("%s", line);
-	/*
-	while ((line = get_next_line(fd)) != NULL)
-	{
-		printf("%s", line);
-		free(line);
-	}*/
-	close(fd1);
-	close(fd2);
-	close(fd3);
-	return (0);
 }
