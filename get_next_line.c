@@ -6,7 +6,7 @@
 /*   By: sech-cha <sech-cha@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/05 15:21:14 by sech-cha          #+#    #+#             */
-/*   Updated: 2026/11/06 22:31:49 by sech-cha         ###   ########.fr       */
+/*   Updated: 2026/11/07 00:56:55 by sech-cha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ char	*ft_strjoin(char *s1, char *s2)
 	int		i;
 	int		j;
 
-	if (s1 && s2)
+	if (!s1 && !s2)
 		return (NULL);
 	join = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
 	if (!join)
@@ -62,7 +62,7 @@ char	*ft_strchar(char *s, int c)
 			return (&s[i]);
         i++;
 	}
-    if (s && s[i] == '\0')
+    if (s && (char)c == '\0')
         return (&s[i]);
 	return (NULL);
 }
@@ -75,26 +75,34 @@ char	*read_and_store(int fd, char *stash)
 
 	buffer = malloc(BUFFER_SIZE + 1);
 	if (!buffer)
+    {
+        free(stash);
 		return (NULL);
+    }
 	bytes = 1;
-	while (!ft_strchar(stash, '\n') || bytes > 0)
+	while (!ft_strchar(stash, '\n') && bytes > 0)
 	{
 		bytes = read(fd, buffer, BUFFER_SIZE);
 		if (bytes < 0)
 		{
             free(buffer);
+            free (stash);
 			return (NULL);
 		}
+        if (bytes == 0)
+            break;
         buffer[bytes] = '\0';
 		tmp = ft_strjoin(stash, buffer);
 		if (!tmp)
 		{
 			free(buffer);
+            free (stash);
 			return (NULL);
 		}
 		free(stash);
 		stash = tmp;
 	}
+    free (buffer);
 	return (stash);
 }
 char	*extract_line(char *stash)
@@ -103,7 +111,7 @@ char	*extract_line(char *stash)
 	int		len;
 	int		i;
 
-	if (!stash)
+	if (!stash || !stash[0])
 		return (NULL);
 	len = 0;
 	while (stash[len] && stash[len] != '\n')
@@ -119,7 +127,7 @@ char	*extract_line(char *stash)
 		line[i] = stash[i];
 		i++;
 	}
-	line[len] = '\0';
+	line[i] = '\0';
 	return (line);
 }
 
@@ -189,17 +197,11 @@ int	main(void)
 		printf("error");
 		return (1);
 	}
-	line = get_next_line(fd);
-	printf("%s", line);
-	line = get_next_line(fd);
-	printf("%s", line);
-	line = get_next_line(fd);
-	printf("%s", line);
-	/*while ((line = get_next_line(fd)) != NULL)
+	while ((line = get_next_line(fd)) != NULL)
 	{
 		printf("%s", line);
 		free(line);
-	}*/
+	}
 	close(fd);
 	return (0);
 }
