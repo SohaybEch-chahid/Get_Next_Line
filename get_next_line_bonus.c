@@ -6,7 +6,7 @@
 /*   By: sech-cha <sech-cha@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/07 00:57:34 by sech-cha          #+#    #+#             */
-/*   Updated: 2026/11/07 12:19:19 by sech-cha         ###   ########.fr       */
+/*   Updated: 2026/11/07 14:56:32 by sech-cha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 int	ft_strlen(char *s)
 {
@@ -170,37 +171,29 @@ void	remove_fd(t_fd **head, int fd)
 	t_fd	*current;
 	t_fd	*tmp;
 
-	if (!head)
+	if (!head || !*head)
 		return ;
 	current = *head;
-	if (!current)
-		return ;
-	if (current && current->fd == fd)
+	if (current->fd == fd)
 	{
 		tmp = current;
-		current = current->next;
+		*head = current->next;
+		free(tmp->stash);
 		free(tmp);
-	}
-	if (!current->next)
 		return ;
-	if (current->next && current->next->fd == fd)
-	{
-		tmp = current;
-		current = current->next;
-		free(tmp);
 	}
-	while (current->next->next)
+	while (current->next)
 	{
 		if (current->next->fd == fd)
 		{
 			tmp = current->next;
-			current = current->next->next;
+			current->next = tmp->next;
+			free(tmp->stash);
 			free(tmp);
 			return ;
 		}
 		current = current->next;
 	}
-	return ;
 }
 
 t_fd	*find_fd(t_fd *head, int fd)
@@ -229,6 +222,7 @@ t_fd	*new_fd(int fd)
 	if (!node)
 		return (NULL);
 	node->fd = fd;
+	node->stash = NULL;
 	node->next = NULL;
 	return (node);
 }
@@ -239,6 +233,7 @@ t_fd	*lst_add_back_fd(t_fd *head, t_fd *new)
 
 	if (!head)
 		return (new);
+	node = head;
 	while (node->next)
 	{
 		node = node->next;
@@ -259,12 +254,16 @@ char	*get_next_line(int fd)
 	if (!node)
 	{
 		node = new_fd(fd);
+		if (!node)
+			return (NULL);
 		head = lst_add_back_fd(head, node);
-		free(node);
 	}
 	node->stash = read_and_store(fd, node->stash);
 	if (!node->stash)
+	{
+		remove_fd(&head, fd);
 		return (NULL);
+	}
 	line = extract_line(node->stash);
 	if (!line)
 	{
@@ -272,6 +271,8 @@ char	*get_next_line(int fd)
 		return (NULL);
 	}
 	node->stash = update_stash(node->stash);
+	if (!node->stash)
+		remove_fd(&head, fd);
 	return (line);
 }
 
