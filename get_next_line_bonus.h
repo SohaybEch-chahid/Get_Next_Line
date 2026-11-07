@@ -6,7 +6,7 @@
 /*   By: sech-cha <sech-cha@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/07 09:59:02 by sech-cha          #+#    #+#             */
-/*   Updated: 2026/11/07 15:39:31 by sech-cha         ###   ########.fr       */
+/*   Updated: 2026/11/07 17:26:41 by sech-cha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,5 +34,7 @@ void			remove_fd(t_fd **head, int fd);
 t_fd			*find_fd(t_fd *head, int fd);
 t_fd			*new_fd(int fd);
 t_fd			*lst_add_back_fd(t_fd *head, t_fd *new_node);
+char			*ft_strdup(const char *s);
+t_fd	*get_fd_node(t_fd **head, int fd);
 
 #endif

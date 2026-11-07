@@ -6,7 +6,7 @@
 /*   By: sech-cha <sech-cha@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/07 15:26:08 by sech-cha          #+#    #+#             */
-/*   Updated: 2026/11/07 15:26:30 by sech-cha         ###   ########.fr       */
+/*   Updated: 2026/11/07 17:20:06 by sech-cha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,4 +60,25 @@ char	*ft_strchar(char *s, int c)
 	if (s && (char)c == '\0')
 		return (&s[i]);
 	return (NULL);
+}
+
+char	*ft_strdup(const char *s)
+{
+	char	*duplicate;
+	int		i;
+
+	i = 0;
+	while (s[i])
+		i++;
+	duplicate = malloc(i + 1);
+	if (!duplicate)
+		return (NULL);
+	i = 0;
+	while (s[i])
+	{
+		duplicate[i] = s[i];
+		i++;
+	}
+	duplicate[i] = '\0';
+	return (duplicate);
 }
