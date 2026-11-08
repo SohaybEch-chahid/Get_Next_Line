@@ -6,7 +6,7 @@
 /*   By: sech-cha <sech-cha@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/07 00:57:34 by sech-cha          #+#    #+#             */
-/*   Updated: 2026/11/07 17:26:07 by sech-cha         ###   ########.fr       */
+/*   Updated: 2026/11/08 16:22:48 by sech-cha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,20 +15,26 @@
 char	*read_buffer(int fd, char *stash, char *buffer)
 {
 	char	*tmp;
-	int		bytes;
+	ssize_t	bytes;
 
 	bytes = 1;
 	while (!ft_strchar(stash, '\n') && bytes > 0)
 	{
 		bytes = read(fd, buffer, BUFFER_SIZE);
 		if (bytes < 0)
-			return (free(stash), NULL);
+		{
+			free(stash);
+			return (NULL);
+		}
 		if (bytes == 0)
 			break ;
 		buffer[bytes] = '\0';
 		tmp = ft_strjoin(stash, buffer);
 		if (!tmp)
-			return (free(stash), NULL);
+		{
+			free(stash);
+			return (NULL);
+		}
 		free(stash);
 		stash = tmp;
 	}
@@ -41,7 +47,10 @@ char	*read_and_store(int fd, char *stash)
 
 	buffer = malloc(BUFFER_SIZE + 1);
 	if (!buffer)
-		return (free(stash), NULL);
+	{
+		free(stash);
+		return (NULL);
+	}
 	stash = read_buffer(fd, stash, buffer);
 	free(buffer);
 	return (stash);
@@ -81,12 +90,18 @@ char	*update_stash(char *stash)
 	current = 0;
 	while (stash[current] && stash[current] != '\n')
 		current++;
-	if (stash[current] == '\0')
-		return (free(stash), NULL);
+	if (!stash[current])
+	{
+		free(stash);
+		return (NULL);
+	}
 	current++;
 	if (!stash[current])
-		return (free(stash), NULL);
-	new_stash = ft_strdup(stash + current);
+	{
+		free(stash);
+		return (NULL);
+	}
+	new_stash = ft_strjoin(stash + current, NULL);
 	free(stash);
 	return (new_stash);
 }
@@ -104,10 +119,16 @@ char	*get_next_line(int fd)
 		return (NULL);
 	node->stash = read_and_store(fd, node->stash);
 	if (!node->stash)
-		return (remove_fd(&head, fd), NULL);
+	{
+		remove_fd(&head, fd);
+		return (NULL);
+	}
 	line = extract_line(node->stash);
 	if (!line)
-		return (remove_fd(&head, fd), NULL);
+	{
+		remove_fd(&head, fd);
+		return (NULL);
+	}
 	node->stash = update_stash(node->stash);
 	if (!node->stash)
 		remove_fd(&head, fd);

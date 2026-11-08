@@ -6,43 +6,36 @@
 /*   By: sech-cha <sech-cha@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/07 15:27:37 by sech-cha          #+#    #+#             */
-/*   Updated: 2026/11/07 17:34:44 by sech-cha         ###   ########.fr       */
+/*   Updated: 2026/11/08 16:08:55 by sech-cha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line_bonus.h"
-
-int	ft_strlen(char *s)
-{
-	int	i;
-
-	i = 0;
-	while (s && s[i])
-		i++;
-	return (i);
-}
 
 char	*ft_strjoin(char *s1, char *s2)
 {
 	char	*join;
 	int		i;
 	int		j;
+	int		k;
 
-	if (!s1 && !s2)
-		return (NULL);
-	join = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
-	if (!join)
-		return (NULL);
 	i = 0;
 	while (s1 && s1[i])
-	{
-		join[i] = s1[i];
 		i++;
-	}
 	j = 0;
 	while (s2 && s2[j])
-		join[i++] = s2[j++];
-	join[i] = '\0';
+		j++;
+	join = malloc(i + j + 1);
+	if (!join)
+		return (NULL);
+	k = 0;
+	j = 0;
+	while (s1 && s1[j])
+		join[k++] = s1[j++];
+	j = 0;
+	while (s2 && s2[j])
+		join[k++] = s2[j++];
+	join[k] = '\0';
 	return (join);
 }
 
@@ -57,43 +50,47 @@ char	*ft_strchar(char *s, int c)
 			return (&s[i]);
 		i++;
 	}
-	if (s && (char)c == '\0')
-		return (&s[i]);
 	return (NULL);
-}
-
-char	*ft_strdup(const char *s)
-{
-	char	*duplicate;
-	int		i;
-
-	i = 0;
-	while (s[i])
-		i++;
-	duplicate = malloc(i + 1);
-	if (!duplicate)
-		return (NULL);
-	i = 0;
-	while (s[i])
-	{
-		duplicate[i] = s[i];
-		i++;
-	}
-	duplicate[i] = '\0';
-	return (duplicate);
 }
 
 t_fd	*get_fd_node(t_fd **head, int fd)
 {
+	t_fd	**link;
 	t_fd	*node;
 
-	node = find_fd(*head, fd);
-	if (!node)
+	link = head;
+	while (*link)
 	{
-		node = new_fd(fd);
-		if (!node)
-			return (NULL);
-		*head = lst_add_back_fd(*head, node);
+		if ((*link)->fd == fd)
+			return (*link);
+		link = &(*link)->next;
 	}
+	node = malloc(sizeof(t_fd));
+	if (!node)
+		return (NULL);
+	node->fd = fd;
+	node->stash = NULL;
+	node->next = NULL;
+	*link = node;
 	return (node);
+}
+
+void	remove_fd(t_fd **head, int fd)
+{
+	t_fd	**link;
+	t_fd	*node;
+
+	link = head;
+	while (*link)
+	{
+		if ((*link)->fd == fd)
+		{
+			node = *link;
+			*link = node->next;
+			free(node->stash);
+			free(node);
+			return ;
+		}
+		link = &(*link)->next;
+	}
 }

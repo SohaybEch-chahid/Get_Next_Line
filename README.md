@@ -28,25 +28,18 @@ The project also introduces the concept of persistent data between function call
 
 The project is written in C and requires a C compiler such as `cc` or `gcc`.
 
-Clone the repository:
-
-```bash
-git clone YOUR_REPOSITORY_URL
-cd get_next_line
-```
-
 Compile the project with a chosen buffer size:
 
 ```bash
 cc -Wall -Wextra -Werror -D BUFFER_SIZE=42 \
-get_next_line.c get_next_line_utils.c main.c -o gnl
+get_next_line.c get_next_line_utils.c -o gnl
 ```
 
 You can change `BUFFER_SIZE` to test different reading sizes:
 
 ```bash
 cc -Wall -Wextra -Werror -D BUFFER_SIZE=1 \
-get_next_line.c get_next_line_utils.c main.c -o gnl
+get_next_line.c get_next_line_utils.c -o gnl
 ```
 
 ### Execution
@@ -58,34 +51,6 @@ Run the compiled program:
 ```
 
 The function can also be tested with a file by opening it with `open()` and passing its file descriptor to `get_next_line()`.
-
-Example:
-
-```c
-#include "get_next_line.h"
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-int main(void)
-{
-    int     fd;
-    char    *line;
-
-    fd = open("test.txt", O_RDONLY);
-    if (fd < 0)
-        return (1);
-
-    while ((line = get_next_line(fd)) != NULL)
-    {
-        printf("%s", line);
-        free(line);
-    }
-
-    close(fd);
-    return (0);
-}
-```
 
 ### Function prototype
 
@@ -242,11 +207,6 @@ HEAD
 
 When `get_next_line()` is called with a file descriptor, `find_fd()` searches for the corresponding node.
 
-- If the node exists, its stash is reused.
-- If it does not exist, `new_fd()` creates a new node.
-- `lst_add_back_fd()` adds the new node to the linked list.
-- `remove_fd()` removes the node when there is no remaining stash or when an error occurs.
-
 ### 6. Why use a linked list?
 
 A linked list was chosen instead of a fixed-size array because:
@@ -266,6 +226,10 @@ get_next_line/
 |-- get_next_line.c
 |-- get_next_line_utils.c
 |-- get_next_line.h
+|
+|-- get_next_line_bonus.c
+|-- get_next_line_utils_bonus.c
+|-- get_next_line_bonus.h
 |-- README.md
 ```
 
@@ -283,7 +247,7 @@ get_next_line/
 
 ### AI Usage
 
-AI tools were used as learning and assistance resources during the development of this project.
+AI tools were used as learning during the development of this project.
 
 They were used for:
 
@@ -292,13 +256,3 @@ They were used for:
 - Understanding dynamic memory allocation and memory ownership.
 - Exploring different approaches to handling multiple file descriptors.
 - Reviewing algorithm logic and identifying potential edge cases.
-- Understanding linked lists and how to manage nodes dynamically.
-- Clarifying concepts and debugging issues encountered during development.
-
-The implementation, testing, and final decisions about the project's code and algorithm were carried out by the student. AI was used as a support tool for learning and understanding the concepts involved.
-
-## Author
-
-**sech-cha**
-
-42 / 1337 Network

@@ -6,7 +6,7 @@
 /*   By: sech-cha <sech-cha@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/05 15:21:14 by sech-cha          #+#    #+#             */
-/*   Updated: 2026/11/07 17:19:20 by sech-cha         ###   ########.fr       */
+/*   Updated: 2026/11/08 18:03:09 by sech-cha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,19 @@ char	*read_buffer(int fd, char *stash, char *buffer)
 	{
 		bytes = read(fd, buffer, BUFFER_SIZE);
 		if (bytes < 0)
-			return (free(stash), NULL);
+		{
+			free(stash);
+			return (NULL);
+		}
 		if (bytes == 0)
 			break ;
 		buffer[bytes] = '\0';
 		tmp = ft_strjoin(stash, buffer);
 		if (!tmp)
-			return (free(stash), NULL);
+		{
+			free(stash);
+			return (NULL);
+		}
 		free(stash);
 		stash = tmp;
 	}
@@ -41,7 +47,10 @@ char	*read_and_store(int fd, char *stash)
 
 	buffer = malloc(BUFFER_SIZE + 1);
 	if (!buffer)
-		return (free(stash), NULL);
+	{
+		free(stash);
+		return (NULL);
+	}
 	stash = read_buffer(fd, stash, buffer);
 	free(buffer);
 	return (stash);
@@ -82,10 +91,16 @@ char	*update_stash(char *stash)
 	while (stash[current] && stash[current] != '\n')
 		current++;
 	if (stash[current] == '\0')
-		return (free(stash), NULL);
+	{
+		free(stash);
+		return (NULL);
+	}
 	current++;
 	if (!stash[current])
-		return (free(stash), NULL);
+	{
+		free(stash);
+		return (NULL);
+	}
 	new_stash = ft_strdup(stash + current);
 	free(stash);
 	return (new_stash);
